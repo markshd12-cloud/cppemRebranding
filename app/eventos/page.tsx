@@ -48,9 +48,9 @@ function EventMeta({ event }: { event: EventItem }) {
 
 export default async function EventosPage() {
   const events = await getEvents();
-  const [highlight, ...rest] = events;
+  // sem evento em destaque: a agenda completa mostra todos
+  const rest = events;
   const upcoming = events.filter((event) => event.status !== "Encerrado").length;
-  const highlightDate = highlight ? formatEventDate(highlight.date) : null;
 
   return <div className="page-shell events-page"><SiteHeader /><main>
 
@@ -64,23 +64,6 @@ export default async function EventosPage() {
         <span className="events-live-chip"><span className="nav-events-dot" aria-hidden="true" /> Vagas limitadas</span>
       </div>
     </div></section>
-
-    {/* SECAO 2 - Evento em destaque */}
-    {highlight && <section className="events-highlight-section"><div className="container">
-      <article className="events-highlight" data-status={highlight.status}>
-        <EventLink event={highlight} className="events-highlight-media">
-          {highlight.imageUrl ? <img src={highlight.imageUrl} alt={`Divulgação: ${highlight.name}`} /> : <Image src="/brand/emblema-leao.webp" alt="" width={160} height={160} />}
-          {highlightDate && <span className="events-date-badge"><strong>{highlightDate.day}</strong>{highlightDate.month}</span>}
-        </EventLink>
-        <div className="events-highlight-copy">
-          <div className="events-tags"><span className="events-status" data-status={highlight.status}>{highlight.status}</span>{highlight.label && <span className="events-label">{highlight.label}</span>}</div>
-          <h2>{highlight.name}</h2>
-          {highlight.description && <p>{highlight.description}</p>}
-          <EventMeta event={highlight} />
-          <EventLink event={highlight} className="gold-button">{ctaByStatus[highlight.status] ?? "Ver evento"} <ArrowRight size={18} /></EventLink>
-        </div>
-      </article>
-    </div></section>}
 
     {/* SECAO 3 - Agenda completa */}
     {rest.length > 0 && <section className="events-list-section"><div className="container">
@@ -104,7 +87,7 @@ export default async function EventosPage() {
     </div></section>}
 
     {/* Sem eventos cadastrados/ativos no Notion */}
-    {!highlight && <section className="events-list-section"><div className="container events-empty">
+    {events.length === 0 && <section className="events-list-section"><div className="container events-empty">
       <Image src="/brand/emblema-leao.webp" alt="" width={90} height={90} />
       <h2>A próxima agenda está sendo preparada.</h2>
       <p>Entre no QG CPPEM e seja avisado assim que as inscrições abrirem.</p>
@@ -112,7 +95,7 @@ export default async function EventosPage() {
     </div></section>}
 
     {/* SECAO 4 - Ser avisado dos proximos (leva ao QG) */}
-    {highlight && <section className="events-qg-section"><div className="container events-qg">
+    {events.length > 0 && <section className="events-qg-section"><div className="container events-qg">
       <div><span className="eyebrow">Não perca o próximo</span><h2 className="display-title">Seja avisado <span className="gold">primeiro.</span></h2><p>Os eventos do CPPEM lotam rápido. No QG, a comunidade gratuita no WhatsApp, você fica sabendo antes de abrir para todo mundo.</p></div>
       <Link className="gold-button" href="/qg">Entrar no QG CPPEM <ArrowRight size={18} /></Link>
     </div></section>}

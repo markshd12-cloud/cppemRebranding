@@ -4,7 +4,6 @@ import { getCourseProducts } from "@/lib/data";
 import { getFreeMaterials } from "@/lib/notion/free-content";
 import { getEcosystemItems } from "@/lib/notion/ecosystem";
 import { getEvents } from "@/lib/notion/events";
-import { getFaixasDestaque } from "@/components/layout/contest-strip";
 
 export async function SiteHeader() {
   // Toda pagina publica passa por aqui, entao isto vale para o site inteiro:
@@ -12,7 +11,7 @@ export async function SiteHeader() {
   // credenciais do Notion e congelaria o menu, a faixa e as vitrines vazios ate
   // o primeiro recalculo. Os dados seguem em cache de 5 minutos.
   await connection();
-  const [products, materials, ecosystemItems, faixas, events] = await Promise.all([getCourseProducts(), getFreeMaterials(), getEcosystemItems(), getFaixasDestaque(), getEvents()]);
+  const [products, materials, ecosystemItems, events] = await Promise.all([getCourseProducts(), getFreeMaterials(), getEcosystemItems(), getEvents()]);
   const featuredCourses = products
     .filter((product) => product.menuFeatured)
     .sort((a, b) => (a.menuOrder ?? Number.MAX_SAFE_INTEGER) - (b.menuOrder ?? Number.MAX_SAFE_INTEGER))
@@ -28,5 +27,5 @@ export async function SiteHeader() {
     return contagem;
   }, {});
 
-  return <SiteHeaderClient featuredCourses={featuredCourses} featuredMaterials={featuredMaterials} ecosystemItems={ecosystemItems} storeCounts={storeCounts} storeTotal={products.length} faixas={faixas} events={events.slice(0, 4)} eventsTotal={events.length} />;
+  return <SiteHeaderClient featuredCourses={featuredCourses} featuredMaterials={featuredMaterials} ecosystemItems={ecosystemItems} storeCounts={storeCounts} storeTotal={products.length} events={events.slice(0, 4)} eventsTotal={events.length} />;
 }
