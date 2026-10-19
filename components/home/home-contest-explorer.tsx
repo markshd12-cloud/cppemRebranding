@@ -22,7 +22,7 @@ export function HomeContestExplorer({ contests, features }: { contests: Contest[
     <div className="home-map-intro" aria-hidden={open || undefined}>
       <span className="eyebrow">Concursos por estado</span>
       <h2 className="display-title">Encontre oportunidades no <span className="gold">seu estado.</span></h2>
-      <p className="section-copy">Acompanhe concursos abertos e previstos no Nordeste. Selecione um estado no mapa e veja as oportunidades e preparações relacionadas.</p>
+      <p className="section-copy">Acompanhe concursos policiais abertos e previstos pelo Brasil. Selecione um estado no mapa e veja as oportunidades e preparações relacionadas.</p>
       <div className="home-map-actions"><Link className="gold-button" href="/concursos" tabIndex={open ? -1 : undefined}>Explorar o mapa completo</Link><Link className="ghost-button" href="/concursos/lista" tabIndex={open ? -1 : undefined}>Ver todos os concursos</Link></div>
     </div>
 

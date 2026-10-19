@@ -32,14 +32,15 @@ export function BrazilMap({ contests, features, compact = false, selectedState, 
   }, [features]);
   const path = useMemo(() => projection ? geoPath(projection) : null, [projection]);
   const stateContests = contests.filter((contest) => contest.states.includes(selected));
-  const activeStates = new Set(northeastStates);
   const statesWithData = new Set(contests.flatMap((contest) => contest.states));
+  // o Nordeste fica sempre clicavel; fora dele, o estado acende quando ganha um concurso publicado no Notion
+  const activeStates = new Set<string>([...northeastStates, ...statesWithData]);
 
   const map = <div className="map-frame">
-    {features.length === 0 ? <div className="state-panel">Mapa temporariamente indisponível.</div> : <svg className="map-svg" viewBox="0 0 600 570" role="img" aria-label="Mapa do Brasil com os estados do Nordeste interativos">
+    {features.length === 0 ? <div className="state-panel">Mapa temporariamente indisponível.</div> : <svg className="map-svg" viewBox="0 0 600 570" role="img" aria-label="Mapa do Brasil com os estados que têm concursos acompanhados">
       {features.map((feature) => {
         const state = ibgeCodeToState[feature.properties.codarea];
-        const active = activeStates.has(state as typeof northeastStates[number]);
+        const active = activeStates.has(state);
         const d = path?.(feature) ?? undefined;
         if (!state || !d) return null;
         // servidor e navegador divergem no ultimo digito do centroide e o React
