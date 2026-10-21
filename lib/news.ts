@@ -39,10 +39,55 @@ function pickString(row: RawNewsRow, ...keys: string[]) {
 }
 
 function stripMarkup(value: string) {
-  return value
-    .replace(/<[^>]*>/g, " ")
+  return decodeEntities(value
+    .replace(/<[^>]*>/g, " "))
     .replace(/[#*_>`~\[\]()]/g, " ")
     .replace(/\s+/g, " ")
+    .trim();
+}
+
+const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", ndash: "–", mdash: "—", hellip: "…", laquo: "«", raquo: "»" };
+
+function decodeEntities(value: string) {
+  return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, code: string) => {
+    if (code[0] === "#") {
+      const n = code[1].toLowerCase() === "x" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
+      return Number.isFinite(n) ? String.fromCodePoint(n) : match;
+    }
+    return ENTITIES[code.toLowerCase()] ?? match;
+  });
+}
+
+/**
+ * O agregador grava o corpo em HTML (posts antigos), Markdown (posts novos) ou
+ * texto puro. Tudo vira Markdown, que o site renderiza sem HTML cru: assim os
+ * subtitulos saem como H2/H3 de verdade e nada de fora executa na pagina.
+ * O H1 e o titulo da pagina, entao qualquer H1 vindo do corpo desce para H2.
+ */
+export function toArticleMarkdown(content: string) {
+  if (!content) return "";
+  let md = content.replace(/\r\n?/g, "\n");
+  if (/<\/?(p|h[1-6]|ul|ol|li|strong|b|em|i|a|br|blockquote|div|span)\b/i.test(md)) {
+    md = md
+      .replace(/<(script|style|iframe|noscript)[\s\S]*?<\/\1>/gi, "")
+      .replace(/<h[12][^>]*>([\s\S]*?)<\/h[12]>/gi, "\n\n## $1\n\n")
+      .replace(/<h[3-6][^>]*>([\s\S]*?)<\/h[3-6]>/gi, "\n\n### $1\n\n")
+      .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, "\n- $1")
+      .replace(/<\/(ul|ol)>/gi, "\n\n")
+      .replace(/<(strong|b)\b[^>]*>([\s\S]*?)<\/\1>/gi, "**$2**")
+      .replace(/<(em|i)\b[^>]*>([\s\S]*?)<\/\1>/gi, "_$2_")
+      .replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, "[$2]($1)")
+      .replace(/<blockquote[^>]*>([\s\S]*?)<\/blockquote>/gi, "\n\n> $1\n\n")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/(p|div)>/gi, "\n\n")
+      .replace(/<[^>]+>/g, "");
+    md = decodeEntities(md);
+  }
+  return md
+    .replace(/^#\s+/gm, "## ")
+    .replace(/^#{4,}\s+/gm, "### ")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
 
@@ -186,12 +231,14 @@ export async function getNewsSitemapEntries() {
 
   const { data, error } = await supabase
     .from(NEWS_TABLE)
-    .select("id,slug,created_at,is_external")
-    .eq("is_external", false)
-    .order("created_at", { ascending: false });
+    .select("id,slug,created_at,is_external,link")
+    .order("created_at", { ascending: false })
+    .limit(5000);
 
   if (error) return [];
-  return (data ?? []).map((row) => ({
+  // o agregador marca tudo como is_external, mas grava em `link` a propria
+  // pagina do CPPEM: so fica fora do sitemap o que realmente aponta para fora
+  return (data ?? []).filter((row) => !(row.is_external && row.link && !isOwnNewsUrl(String(row.link)))).map((row) => ({
     routeKey: String(row.slug || row.id),
     lastModified: row.created_at ? new Date(row.created_at) : undefined,
   }));
