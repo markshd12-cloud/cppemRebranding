@@ -97,9 +97,7 @@ const plans = [
     features: [
       "Tudo do Plano Operacional",
       "Mentorias ao vivo mensais",
-      "Acesso aos cursos da plataforma",
       "Mudança de curso sempre que necessário",
-      "Acesso às aulas e aos materiais didáticos",
       "Preparação de TAF, psicotécnico e método MDT",
     ],
   },

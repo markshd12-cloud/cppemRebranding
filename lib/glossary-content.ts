@@ -276,7 +276,7 @@ export const glossarySections: readonly GlossarySection[] = [
 			{ term: "Plano de Combate", definition: "Produto de acompanhamento e preparação do CPPEM, com diferentes modalidades e níveis de suporte." },
 			{ term: "Plano de Combate Operacional", definition: "Modalidade com cronogramas, metas, relatórios, ranking e grupo de apoio, sem mentorias ao vivo." },
 			{ term: "Plano de Combate Supremo", definition: "Modalidade com mentorias semanais, cursos, cronogramas personalizados, metas, questões e relatórios." },
-			{ term: "Plano de Combate Tático", definition: "Modalidade com mentorias mensais, acesso aos cursos, aulas e materiais didáticos." },
+			{ term: "Plano de Combate Tático", definition: "Modalidade com mentorias mensais, aulas e materiais didáticos." },
 			{ term: "Plano de estudos", definition: "Documento que define o que, quando e como o aluno deve estudar." },
 			{ term: "Plataforma", definition: "Ambiente digital utilizado para disponibilizar aulas, materiais, cronogramas e questões." },
 			{ term: "Pós-edital", definition: "Período iniciado após a publicação do edital." },
